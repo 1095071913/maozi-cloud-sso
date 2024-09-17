@@ -19,7 +19,7 @@ public class RestClientServiceImplV1 extends ClientServiceImpl implements RestCl
 
 	@Override
 	public AbstractBaseResult<PageResult<ClientListVo>> restList(PageParam<ClientListParam> pageParam) {
-		return success(list(pageParam, ClientListVo::new));
+		return success(list(pageParam, ClientListVo.class));
 	}
 
 	@Override

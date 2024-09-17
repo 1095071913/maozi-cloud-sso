@@ -21,10 +21,6 @@ import com.alibaba.nacos.shaded.com.google.common.collect.Sets;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
-import com.gitee.sunchenbin.mybatis.actable.annotation.Index;
-import com.gitee.sunchenbin.mybatis.actable.annotation.TableComment;
-import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import com.maozi.base.AbstractBaseNameDomain;
 import com.maozi.common.BaseCommon;
 import com.maozi.oauth.client.enums.AuthType;
@@ -39,70 +35,69 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
-/**	
- * 
- *  Specifications：功能
- * 
- *  Author：彭晋龙
- * 
- *  Creation Date：2021-12-18:16:32:34
- *
- *  Copyright Ownership：xiao mao zi
- * 
- *  Agreement That：Apache 2.0
- * 
+/**
+ * 客户端
  */
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @TableName(value = "oauth_client_details",autoResultMap = true)
-@TableComment("客户端")
 public class ClientDo extends AbstractBaseNameDomain implements ClientDetails {
-	
-	@Index
-	@Column(value = "client_id",comment = "客户端Id")
+
+	/**
+	 * 客户端Id
+	 */
 	private String clientId;
 
 	@TableField(typeHandler = AuthTypesHandler.class)
-	@Column(value = "auth_types",defaultValue = "\"[4]\"",type = MySqlTypeConstant.VARCHAR)
 	private Set<AuthType> authTypes;
-	
-	@Column(value = "remark",comment = "备注")
+
+	/**
+	 * 备注
+	 */
 	private String remark;
 
 	@TableField(typeHandler = JacksonTypeHandler.class)
-	@Column(value = "resource_ids",defaultValue = "\"[\\\"backend-resources\\\"]\"",type = MySqlTypeConstant.VARCHAR)
 	private Set<String> resourceIds;
-	
-	@Column(value = "client_secret",comment = "客户端密钥")
+
+	/**
+	 * 客户端密钥
+	 */
 	private String clientSecret;
 
+	/**
+	 * 授权范围
+	 */
 	@TableField(typeHandler = JacksonTypeHandler.class)
-	@Column(value = "scope",defaultValue = "\"[\\\"backend\\\"]\"",comment = "范围",type = MySqlTypeConstant.VARCHAR)
 	private Set<String> scope;
 
+	/**
+	 * 重定向地址
+	 */
 	@TableField(typeHandler = JacksonTypeHandler.class)
-	@Column(value = "registered_redirect_uri",comment = "重定向地址",type = MySqlTypeConstant.VARCHAR)
 	private Set<String> registeredRedirectUri;
 
+	/**
+	 * 权限标识
+	 */
 	@TableField(typeHandler = JacksonTypeHandler.class)
-	@Column(value = "authorities",comment = "权限标识",defaultValue = "\"[]\"",type = MySqlTypeConstant.VARCHAR)
 	private List<GrantedAuthority> authorities;
-	
-	@Column(value = "access_token_validity_seconds",defaultValue = "86400",comment = "授权令牌有效期 秒")
+
+	/**
+	 * 授权令牌有效期 秒
+	 */
 	private Integer accessTokenValiditySeconds;
-	
-	@Column(value = "refresh_token_validity_seconds",defaultValue = "86400",comment = "刷新令牌有效期 秒")
+
+	/**
+	 * 刷新令牌有效期 秒
+	 */
 	private Integer refreshTokenValiditySeconds;
 
 	@TableField(typeHandler = JacksonTypeHandler.class)
-	@Column(value = "additional_information",type = MySqlTypeConstant.VARCHAR)
 	private Map<String, Object> additionalInformation;
 
 	@TableField(typeHandler = JacksonTypeHandler.class)
-	@Column(value = "autoapprove",type = MySqlTypeConstant.VARCHAR)
 	private Set<String> autoapprove;
 
 	@Override

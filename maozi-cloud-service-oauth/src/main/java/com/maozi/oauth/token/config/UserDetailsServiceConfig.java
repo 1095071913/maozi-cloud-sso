@@ -18,6 +18,7 @@
 package com.maozi.oauth.token.config;
 
 import com.google.common.collect.Lists;
+import com.maozi.base.error.code.SystemErrorCode;
 import com.maozi.common.BaseCommon;
 import com.maozi.system.user.api.rpc.v1.RpcUserInfoServiceV1;
 import com.maozi.system.user.api.rpc.v1.RpcUserServiceV1;
@@ -32,7 +33,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserDetailsServiceConfig extends BaseCommon implements UserDetailsService {
+public class UserDetailsServiceConfig extends BaseCommon<SystemErrorCode> implements UserDetailsService {
 	
 	@DubboReference
 	private RpcUserServiceV1 rpcUserService;
@@ -47,7 +48,7 @@ public class UserDetailsServiceConfig extends BaseCommon implements UserDetailsS
 
 		List<GrantedAuthority> grantedAuthorities = Lists.newCopyOnWriteArrayList();
 		
-		permissions.stream().forEach((permission)->{
+		permissions.forEach((permission)->{
 			grantedAuthorities.add(new SimpleGrantedAuthority(permission));
 		});
 

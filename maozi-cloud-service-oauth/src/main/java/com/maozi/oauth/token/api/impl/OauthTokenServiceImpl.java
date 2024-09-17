@@ -12,11 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 
 package com.maozi.oauth.token.api.impl;
 
+import com.maozi.base.error.code.SystemErrorCode;
 import com.maozi.common.BaseCommon;
 import com.maozi.common.result.error.exception.BusinessResultException;
 import com.maozi.oauth.client.enums.AuthType;
@@ -24,6 +25,7 @@ import com.maozi.oauth.token.api.OauthTokenService;
 import com.maozi.oauth.token.dto.platform.dto.OauthToken;
 import com.maozi.oauth.token.dto.platform.param.ClientParam;
 import com.maozi.oauth.token.dto.platform.param.TokenInfoParam;
+import com.maozi.oauth.token.error.code.TokenErrorCode;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Resource;
@@ -40,22 +42,10 @@ import org.springframework.security.oauth2.provider.endpoint.CheckTokenEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
 import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.stereotype.Service;
 
-/**
- * 
- * Specifications：功能
- * 
- * Author：彭晋龙
- * 
- * Creation Date：2021-12-18:16:32:34
- *
- * Copyright Ownership：xiao mao zi
- * 
- * Agreement That：Apache 2.0
- * 
- */
-
-public class OauthTokenServiceImpl extends BaseCommon implements OauthTokenService {
+@Service
+public class OauthTokenServiceImpl extends BaseCommon<TokenErrorCode> implements OauthTokenService {
 
 	@Resource
 	public TokenStore tokenStore;
@@ -65,27 +55,24 @@ public class OauthTokenServiceImpl extends BaseCommon implements OauthTokenServi
 
 	@Resource
 	private CheckTokenEndpoint checkTokenEndpoint;
-	
+
 	@Resource
 	public ConsumerTokenServices consumerTokenServices;
-	
+
 	@Resource
 	private AuthorizationServerSecurityConfiguration authorizationServerSecurityConfiguration;
-	
-	@Override
-	public String getServiceName() { return "token-rpc"; }
-	
+
 	@Override
 	public String getAbbreviationModelName() { return "【授权】"; }
-	
+
 	public OauthToken get(String clientId,String clientSecret,AuthType type,String username,String password,String refreshTokenParam) throws Exception {
-		
+
 		try {
-			
+
 			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(clientId, clientSecret);
-			
+
 			Authentication authenticate = authorizationServerSecurityConfiguration.authenticationManagerBean().authenticate(authRequest);
-			
+
 			Map<String, String> map = new HashMap<>() {{
 				put("client_id", clientId);
 				put("client_secret", clientSecret);
@@ -94,20 +81,19 @@ public class OauthTokenServiceImpl extends BaseCommon implements OauthTokenServi
 				put("password", password);
 				put("refresh_token", refreshTokenParam);
 			}};
-			
+
 			ResponseEntity<OAuth2AccessToken> accessTokenResult = tokenEndpoint.getAccessToken(authenticate, map);
-			
+
 			DefaultOAuth2AccessToken accessToken = (DefaultOAuth2AccessToken) accessTokenResult.getBody();
-			
+
 			DefaultExpiringOAuth2RefreshToken refreshToken = (DefaultExpiringOAuth2RefreshToken) accessToken.getRefreshToken();
-			
+
 			return new OauthToken(accessToken.getValue(),refreshToken.getValue(),(accessToken.getExpiration().getTime() - System.currentTimeMillis()) / 1000L,(refreshToken.getExpiration().getTime() - System.currentTimeMillis()) / 1000L);
-			
-		} catch (InvalidGrantException e) {throw new BusinessResultException(getAbbreviationModelName()+"密码错误");
-		
-		} catch (InternalAuthenticationServiceException e) {throw new BusinessResultException(e.getLocalizedMessage());}
-		
-		
+
+		} catch (InvalidGrantException e) {throw new BusinessResultException(getAbbreviationModelName(),getCodes().PASSWORD_ERROR);
+
+		} catch (InternalAuthenticationServiceException e) {throw new BusinessResultException(SystemErrorCode.SYSTEM_ERROR,200);}
+
 	}
 	
 	public OauthToken get(TokenInfoParam param) throws Exception {
@@ -119,13 +105,13 @@ public class OauthTokenServiceImpl extends BaseCommon implements OauthTokenServi
 	}
 	
 	public Map check(String token) {
-		
+
 		try { return checkTokenEndpoint.checkToken(token);}catch (Exception e) {
-			throw new BusinessResultException(error(code(3)));
+			throw new BusinessResultException(getAbbreviationModelName(),getBaseCodes().USER_AUTH_ERROR);
 		}
-		
+
 	}
-	
+
 	public void destroy(String token) {
 		consumerTokenServices.revokeToken(token);
 	}

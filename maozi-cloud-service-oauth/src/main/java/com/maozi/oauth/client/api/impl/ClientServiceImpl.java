@@ -3,7 +3,9 @@ package com.maozi.oauth.client.api.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.maozi.base.AbstractBaseDtomain;
 import com.maozi.base.api.impl.BaseServiceImpl;
+import com.maozi.base.error.code.SystemErrorCode;
 import com.maozi.oauth.client.api.ClientService;
 import com.maozi.oauth.client.domain.ClientDo;
 import com.maozi.oauth.client.dto.v1.platform.ClientSaveUpdateParam;
@@ -18,7 +20,7 @@ import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ClientServiceImpl extends BaseServiceImpl<ClientMapper,ClientDo,Void> implements ClientService {
+public class ClientServiceImpl extends BaseServiceImpl<ClientMapper,ClientDo,AbstractBaseDtomain,SystemErrorCode> implements ClientService {
 
 	@Override
 	protected String getAbbreviationModelName() {return "【客户端】";}
